@@ -19,6 +19,7 @@ apbot=Flask(__name__)
 @apbot.route("/sms",methods=["GET","POST"])
 def reply():
     num=request.form.get("From").replace("whatsapp:","")
+    print(num)
     msg_text=request.form.get("Body")
     x=collection.find_one({"NUMBER":num})
     try:
@@ -49,7 +50,13 @@ enter *3* to get complete match information for an ongoing match.
                 if (len(match_data)==1):
                  match_id=match_data[0]["id"]
                 livescore=c.livescore(mid=match_id)
-                livescore=json.dumps(livescore)
+                batting_team=livescore["batting"]["team"]
+                batting_inn=livescore["batting"]["score"][0]["inning_num"]
+                batting_score=livescore["batting"]["score"][0]["runs"]
+                battig_overs=livescore["batting"]["score"][0]["overs"]
+                batting_wickets=livescore["batting"]["score"][0]["wickets"]
+                livescore=f"""Currently innings no {batting_inn} is going on , {batting_team} is doing the batting.
+Cuurent score is {batting_score} runs  at the end of {battig_overs} overs with the loss of {batting_wickets} wickets."""
                 resp=msg.message(livescore)
                 return (str(msg))
 
@@ -63,7 +70,6 @@ enter *3* to get complete match information for an ongoing match.
                 if (len(match_data)==1):
                  match_id=match_data[0]["id"]
                 fullscore=c.scorecard(mid=match_id)
-                fullscore=json.dumps(fullscore)
                 resp=msg.message(fullscore)
                 return (str(msg))
 
